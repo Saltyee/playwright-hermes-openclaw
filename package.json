@@ -1,0 +1,27 @@
+{
+  "name": "web-automation-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A simple, scalable web automation skeleton using Playwright Test.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:critical": "playwright test --grep @critical",
+    "test:regression": "playwright test --grep @regression",
+    "report": "playwright show-report reports/playwright",
+    "allure:generate": "allure generate reports/allure-results --output reports/allure-report",
+    "allure:open": "allure open reports/allure-report",
+    "allure:serve": "allure open reports/allure-results"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "allure": "^3.17.0",
+    "allure-playwright": "^3.12.1",
+    "dotenv": "^17.4.2"
+  }
+}

@@ -1,0 +1,331 @@
+# Web Automation Agent
+
+This project is a JavaScript Playwright web automation framework.
+
+OrangeHRM Demo is currently used as the sample application while the framework is being developed. The current tests cover valid and invalid authentication only.
+
+The framework includes Playwright MCP for browser exploration and Hermes as an
+investigation-only QA assistant. OpenClaw remains a placeholder for a later
+phase.
+
+## Architecture
+
+Normal test execution remains deterministic:
+
+```text
+Playwright Test
+  ↓
+Actions
+  ↓
+Page Objects
+  ↓
+Browser
+  ↓
+Reports
+```
+
+AI browser exploration is separate:
+
+```text
+Hermes
+  ↓
+Playwright MCP
+  ↓
+Browser
+```
+
+Playwright MCP helps an AI agent inspect pages and discover locators. The automated tests do not depend on MCP when they run.
+
+## Folder structure
+
+```text
+web-automation-agent/
+├── tests/authentication/  # Authentication test scenarios
+├── pages/                 # Page elements and page interactions
+├── actions/               # Reusable user and business actions
+├── suites/                # Smoke, critical, and regression grouping notes
+├── test-data/             # Reusable testing data
+├── helpers/               # Shared utility functions
+├── config/                # Framework configuration
+├── reports/               # Playwright and Allure results
+├── agents/hermes/         # Hermes QA instructions and operating guide
+├── agents/openclaw/       # Future orchestration placeholder
+├── mcp/                   # AI browser integration using Playwright MCP
+├── .codex/config.toml     # Project-scoped MCP configuration for Codex
+├── .hermes.md             # Project instructions automatically read by Hermes
+├── playwright.config.js
+└── package.json
+```
+
+Tests are grouped with Playwright tags. Test implementations are not copied into the `suites` folders.
+
+## Installation
+
+Install Node.js 20 or newer, then run:
+
+```bash
+npm install
+npx playwright install
+```
+
+## Environment setup
+
+Copy `.env.example` to `.env` and set the current OrangeHRM Demo credentials:
+
+```dotenv
+BASE_URL=https://opensource-demo.orangehrmlive.com
+ORANGEHRM_USERNAME=your_demo_username
+ORANGEHRM_PASSWORD=your_demo_password
+```
+
+The login page displays the current demo credentials. Keep working credentials only in `.env`; this file is ignored by Git.
+
+## Run tests
+
+Run all authentication tests:
+
+```bash
+npm test
+```
+
+Run with a visible browser:
+
+```bash
+npm run test:headed
+```
+
+Start Playwright Inspector for debugging:
+
+```bash
+npm run test:debug
+```
+
+Run the valid-login smoke coverage:
+
+```bash
+npm run test:smoke
+```
+
+Run the valid-login critical coverage:
+
+```bash
+npm run test:critical
+```
+
+Run all positive and negative regression coverage:
+
+```bash
+npm run test:regression
+```
+
+## Test reports
+
+Each test run creates both Playwright HTML data and Allure result data. Reporting is configured centrally in `playwright.config.js`; individual tests do not contain screenshot, video, trace, or report-generation code.
+
+Generated output is organized as:
+
+```text
+reports/
+├── playwright/       # Playwright HTML report
+├── test-results/     # Screenshots, videos, and traces
+├── allure-results/   # Raw Allure result data
+└── allure-report/    # Generated Allure HTML report
+```
+
+All generated report folders are ignored by Git.
+
+### Playwright HTML Report
+
+The Playwright HTML report is built into Playwright. It is fast to open locally and useful for checking passed and failed tests, duration, test files, errors, and failure attachments.
+
+Open the latest report:
+
+```bash
+npm run report
+```
+
+### Allure Report
+
+The Allure report provides a richer suite overview and presentation. It is useful when reviewing suite coverage or presenting the project as a portfolio or demo.
+
+Generate the saved Allure HTML report from the latest results:
+
+```bash
+npm run allure:generate
+```
+
+Open the generated report:
+
+```bash
+npm run allure:open
+```
+
+Generate and serve a temporary report directly from the results:
+
+```bash
+npm run allure:serve
+```
+
+### Failure evidence
+
+Successful tests keep unnecessary artifacts to a minimum. When a test fails, Playwright retains a screenshot and video. If the test retries, the first retry also records a trace.
+
+Open a trace with:
+
+```bash
+npx playwright show-trace reports/test-results/<test-result-folder>/trace.zip
+```
+
+Trace Viewer shows the test actions, page snapshots, console information, network activity, timing, and DOM state around the failure.
+
+Use this practical debugging flow:
+
+```text
+Test fails
+  ↓
+Read test error
+  ↓
+Check screenshot
+  ↓
+Check video
+  ↓
+Open trace
+  ↓
+Inspect report
+  ↓
+Fix automation or application issue
+  ↓
+Rerun test
+```
+
+## Playwright MCP
+
+Playwright is used for repeatable automated tests and assertions:
+
+```text
+Code → Playwright → Browser
+```
+
+Playwright MCP provides interactive browser access for an AI agent:
+
+```text
+AI Agent → Playwright MCP → Browser
+```
+
+The project-scoped configuration uses Microsoft's official `@playwright/mcp@latest` server with a fresh isolated browser session. Trust the project and restart Codex after configuration changes, then check the connection with:
+
+```bash
+codex mcp list
+```
+
+Example exploration requests:
+
+```text
+Open the OrangeHRM login page and inspect the login form.
+
+Identify the username field, password field, and Login button.
+
+Find stable Playwright locators for the OrangeHRM login form.
+
+Login to OrangeHRM and identify a stable element that proves the Dashboard has opened.
+
+Try invalid credentials and identify the login error message.
+```
+
+These are interactive exploration requests, not replacements for deterministic tests. See `mcp/playwright/README.md` for more details.
+
+## Hermes Controlled Repair
+
+Hermes is an AI-assisted QA investigation and controlled repair layer.
+Playwright runs the actual automated tests and remains the source of execution
+evidence. Hermes can inspect the test/action/page-object chain, artifacts, and
+current OrangeHRM UI. When strong evidence proves an automation issue, Hermes
+may apply one small relevant repair.
+
+Regular automation remains:
+
+```text
+Playwright
+  ↓
+OrangeHRM
+  ↓
+Report
+```
+
+Failure investigation is:
+
+```text
+Playwright Failure
+  ↓
+Hermes
+  ↓
+Read Test / Action / Page Object / Evidence
+  ↓
+Playwright MCP
+  ↓
+Inspect OrangeHRM
+  ↓
+Root Cause Analysis
+  ↓
+Suggested Fix
+```
+
+Controlled repair is:
+
+```text
+Test Failure
+  ↓
+Hermes Investigation
+  ↓
+Playwright MCP Inspection
+  ↓
+Root Cause
+  ↓
+AUTOMATION ISSUE
+  ↓
+Minimal Code Repair
+  ↓
+Rerun Failed Test
+  ↓
+Rerun Related Suite
+  ↓
+Show Exact Diff
+```
+
+Hermes never repairs application, test-data, environment, network, or unknown
+issues. It preserves unrelated work, keeps meaningful assertions, avoids
+arbitrary sleeps, and stops after two repair attempts. It cannot commit, push,
+merge, or create pull requests.
+
+Start it from the project root with `hermes chat --in .`. The complete
+evidence requirements, allowed files, validation order, audit format, and
+example request are in `agents/hermes/README.md`.
+
+## Test suites
+
+- Smoke: the smallest valid-login check.
+- Critical: authentication that must work for the application to be usable.
+- Regression: valid and invalid authentication coverage.
+
+Playwright tags control these groups through the npm scripts.
+
+## Future roadmap
+
+- Add more tests when new application areas enter scope.
+- Add GitHub Actions for automated test runs.
+- Expand reporting history when continuous test execution is introduced.
+- Continue using Playwright MCP for UI investigation and locator discovery.
+- Extend Hermes beyond controlled local repair only after explicit approval.
+- Add OpenClaw for orchestration, scheduling, notifications, and delegation to Hermes.
+
+The future agent flow will be:
+
+```text
+OpenClaw
+  ↓
+Hermes
+  ↓
+Playwright MCP
+  ↓
+Browser
+```

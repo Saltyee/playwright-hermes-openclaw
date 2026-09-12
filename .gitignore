@@ -1,0 +1,14 @@
+node_modules/
+.playwright-mcp/
+reports/playwright/
+reports/test-results/
+reports/allure-results/
+reports/allure-report/
+reports/hermes/
+playwright-report/
+test-results/
+allure-results/
+allure-report/
+.env
+.DS_Store
+*.log
