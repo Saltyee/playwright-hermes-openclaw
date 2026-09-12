@@ -4,7 +4,7 @@ class DashboardPage {
   constructor(page) {
     this.page = page;
     this.dashboardHeading = page.getByRole('heading', {
-      name: 'Employee Management',
+      name: 'Dashboard',
       level: 6,
     });
   }
