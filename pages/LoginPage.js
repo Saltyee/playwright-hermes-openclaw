@@ -6,7 +6,7 @@ class LoginPage {
     this.loginHeading = page.getByRole('heading', { name: 'Login', level: 5 });
     this.usernameInput = page.getByRole('textbox', { name: 'Username' });
     this.passwordInput = page.getByPlaceholder('Password');
-    this.loginButton = page.getByRole('button', { name: 'Sign in' });
+    this.loginButton = page.getByRole('button', { name: 'Login' });
     this.forgotPasswordLink = page.getByText('Forgot your password?', {
       exact: true,
     });
