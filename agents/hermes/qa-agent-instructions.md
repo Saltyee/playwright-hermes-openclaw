@@ -42,6 +42,28 @@ npm run test:regression
 npx playwright test tests/authentication/valid-login.test.js
 ```
 
+For a report-only run, execute the requested command directly. A fresh run
+means invoking the command again; it does not mean deleting prior reports or
+test artifacts. Never prepend `rm`, cleanup, Git mutation, or another
+destructive command. Keep the test invocation separate from read-only evidence
+checks so an approval cannot delay the A2A task past its lifecycle timeout.
+
+Run the requested test or suite exactly once unless it fails and the user has
+authorized the controlled repair workflow. When a report-only run passes, stop
+testing and summarize it; do not rerun it for different reporter output or a
+second duration.
+
+Use the framework's known evidence locations after a run:
+
+- `reports/playwright/index.html`
+- `reports/allure-results/`
+- `reports/test-results/.last-run.json`
+
+Do not use broad filesystem discovery such as `find .` to locate reports. Do
+not run `gh auth status` or another credential-status command for a report-only
+test. GitHub authentication is relevant only when an authorized, verified
+automation repair is ready to push and open as a Draft Pull Request.
+
 ## Required evidence before editing
 
 Never edit immediately after seeing a failure. Complete this order:

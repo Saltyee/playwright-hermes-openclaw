@@ -4,9 +4,9 @@ This project is a JavaScript Playwright web automation framework.
 
 OrangeHRM Demo is currently used as the sample application while the framework is being developed. The current tests cover valid and invalid authentication only.
 
-The framework includes Playwright MCP for browser exploration and Hermes as an
-investigation-only QA assistant. OpenClaw remains a placeholder for a later
-phase.
+The framework includes Playwright MCP for browser exploration, Hermes as the QA
+execution and controlled-repair agent, and OpenClaw as the local QA
+orchestrator.
 
 ## Architecture
 
@@ -36,6 +36,21 @@ Browser
 
 Playwright MCP helps an AI agent inspect pages and discover locators. The automated tests do not depend on MCP when they run.
 
+QA orchestration uses A2A v1.0:
+
+```text
+User
+  ↓
+OpenClaw
+  ↓ A2A
+Hermes
+  ├── Playwright Test
+  ├── Playwright MCP
+  └── GitHub Draft Pull Requests
+  ↓
+OrangeHRM / Test Result / Repair / Draft PR
+```
+
 ## Folder structure
 
 ```text
@@ -49,7 +64,7 @@ web-automation-agent/
 ├── config/                # Framework configuration
 ├── reports/               # Playwright and Allure results
 ├── agents/hermes/         # Hermes QA instructions and operating guide
-├── agents/openclaw/       # Future orchestration placeholder
+├── agents/openclaw/       # OpenClaw A2A orchestration instructions
 ├── mcp/                   # AI browser integration using Playwright MCP
 ├── .codex/config.toml     # Project-scoped MCP configuration for Codex
 ├── .hermes.md             # Project instructions automatically read by Hermes
@@ -339,6 +354,36 @@ allowlist contains only repository/branch reads and Pull Request
 listing/reading/creation. Credentials remain in private environment storage;
 they are never committed.
 
+## OpenClaw QA Orchestration
+
+OpenClaw acts as the control plane for this QA project. The user sends a simple
+QA request to OpenClaw, which delegates the work once to Hermes through A2A
+v1.0. Hermes performs test execution, Playwright MCP investigation, controlled
+repair, and the GitHub Draft Pull Request workflow. Hermes returns the result,
+and OpenClaw gives the user a concise summary.
+
+OpenClaw does not have duplicate Playwright MCP or GitHub MCP integrations. Its
+tool policy allows only reading its workspace instructions and executing the
+single allowlisted native A2A task client. It cannot edit automation or execute
+the QA/Git workflow itself.
+
+The initial connection is local:
+
+```text
+OpenClaw peer: hermes
+  ↓
+http://127.0.0.1:9900/
+  ↓
+Hermes QA Agent
+```
+
+The A2A task lifecycle distinguishes working, completed, failed, and rejected
+tasks so a long-running suite is followed instead of submitted twice. Test
+failures are reported separately from orchestration failures.
+
+See `agents/openclaw/README.md` for usage and
+`agents/openclaw/qa-orchestrator-instructions.md` for the operating rules.
+
 ## Test suites
 
 - Smoke: the smallest valid-login check.
@@ -354,16 +399,16 @@ Playwright tags control these groups through the npm scripts.
 - Expand reporting history when continuous test execution is introduced.
 - Continue using Playwright MCP for UI investigation and locator discovery.
 - Review and refine controlled Hermes repair Pull Requests before merge.
-- Add OpenClaw for orchestration, scheduling, notifications, and delegation to Hermes.
+- Add an approved local user interface or messaging channel in a later phase.
+- Add scheduling and notifications only after manual orchestration is stable.
 
-The future agent flow will be:
+The current agent flow is:
 
 ```text
 OpenClaw
-  ↓
+  ↓ A2A
 Hermes
-  ↓
-Playwright MCP
-  ↓
-Browser
+  ├── Playwright Test
+  ├── Playwright MCP
+  └── GitHub Draft Pull Requests
 ```
