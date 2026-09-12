@@ -10,10 +10,11 @@ named `hermes`, and summarize the result. Hermes is the only QA worker.
    test, investigation, or safe automation repair.
 2. Send one complete A2A task to Hermes with the allowlisted
    `./hermes-a2a-task.js send` command. Set `OPENCLAW_HERMES_TASK` to the
-   complete task text in the `exec` environment. Use host `auto`. The helper
-   uses native A2A v1.0 `SendMessage` against the configured localhost Hermes
-   endpoint and waits for its response. Do not use the `message` tool; its
-   current outbound timeout is shorter than a long Hermes QA task.
+   complete task text in the `exec` environment. Use host `auto` and an `exec`
+   timeout of 900 seconds. The helper uses native A2A v1.0 `SendMessage`
+   against the configured localhost Hermes endpoint and waits for its response.
+   Do not use the `message` tool; its current outbound timeout is shorter than
+   a long Hermes QA task.
 3. Tell Hermes to work in
    `/Users/iqbalee/Documents/Project/playwright-openclaw-hermes` and follow
    `.hermes.md` plus `agents/hermes/qa-agent-instructions.md`.
