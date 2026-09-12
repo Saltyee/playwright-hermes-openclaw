@@ -294,12 +294,50 @@ Show Exact Diff
 
 Hermes never repairs application, test-data, environment, network, or unknown
 issues. It preserves unrelated work, keeps meaningful assertions, avoids
-arbitrary sleeps, and stops after two repair attempts. It cannot commit, push,
-merge, or create pull requests.
+arbitrary sleeps, and stops after two repair attempts.
 
 Start it from the project root with `hermes chat --in .`. The complete
 evidence requirements, allowed files, validation order, audit format, and
 example request are in `agents/hermes/README.md`.
+
+## Automated Repair Pull Requests
+
+Hermes can investigate certain Playwright failures and prepare a verified
+repair. If the failure is clearly an automation issue, Hermes may create a
+dedicated `qa-fix/` branch, update the automation, verify the failed test and
+related suite, commit only the relevant change, push the repair branch, and
+open a Draft Pull Request.
+
+A human must review and merge the Pull Request. Hermes must not push directly
+to the base branch, force push, approve or merge the Pull Request, delete the
+branch, or include unrelated files.
+
+```text
+Playwright Failure
+  ↓
+Hermes
+  ↓
+Playwright MCP
+  ↓
+Root Cause
+  ↓
+Automation Repair
+  ↓
+Test Verification
+  ↓
+Git Branch
+  ↓
+Commit
+  ↓
+Draft Pull Request
+  ↓
+Human Review
+```
+
+The official GitHub MCP server is configured outside the repository. Its
+allowlist contains only repository/branch reads and Pull Request
+listing/reading/creation. Credentials remain in private environment storage;
+they are never committed.
 
 ## Test suites
 
@@ -315,7 +353,7 @@ Playwright tags control these groups through the npm scripts.
 - Add GitHub Actions for automated test runs.
 - Expand reporting history when continuous test execution is introduced.
 - Continue using Playwright MCP for UI investigation and locator discovery.
-- Extend Hermes beyond controlled local repair only after explicit approval.
+- Review and refine controlled Hermes repair Pull Requests before merge.
 - Add OpenClaw for orchestration, scheduling, notifications, and delegation to Hermes.
 
 The future agent flow will be:
