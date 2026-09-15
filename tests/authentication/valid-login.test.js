@@ -4,6 +4,7 @@ const {
   verifyLoginPageIsDisplayed,
   loginWithValidCredentials,
   verifyDashboardIsOpened,
+  verifyDashboardSideMenu,
 } = require('../../actions/authActions');
 
 test(
@@ -14,5 +15,6 @@ test(
     await verifyLoginPageIsDisplayed(page);
     await loginWithValidCredentials(page);
     await verifyDashboardIsOpened(page);
+    await verifyDashboardSideMenu(page);
   },
 );

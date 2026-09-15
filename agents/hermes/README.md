@@ -16,6 +16,14 @@ only as present, missing, valid, invalid, or expired.
 The repository-level `.hermes.md` loads the full rules in
 `qa-agent-instructions.md` when Hermes starts in this project.
 
+## Latest report reading
+
+Playwright writes a machine-readable report to
+`reports/playwright/results.json`. For report-viewing requests, Hermes uses the
+project reader and returns a concise summary, detailed test list, or failed
+tests only. It does not send raw JSON or the HTML report and does not rerun or
+repair tests unless the user separately requests that work.
+
 ## Playwright MCP
 
 Hermes connects directly to Microsoft's `@playwright/mcp@latest` through its

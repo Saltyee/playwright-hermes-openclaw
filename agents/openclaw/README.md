@@ -67,6 +67,9 @@ Run the OrangeHRM valid login test.
 Run smoke and investigate failures.
 Run regression and repair automation issues if safe.
 Run smoke, repair automation issues, and prepare a Draft PR if needed.
+Show the latest report.
+Show report details.
+Show failed tests.
 ```
 
 OpenClaw translates these requests into one A2A task for Hermes. If Hermes
@@ -89,6 +92,13 @@ not complete; OpenClaw must not describe that as a test failure.
 Detailed evidence remains in Playwright/Allure reports, screenshots, videos,
 traces, Hermes findings, Git diffs, and Draft Pull Requests. OpenClaw provides
 only the concise operational summary.
+
+For latest-report requests, Perrona delegates report reading to Hermes. Hermes
+uses the machine-readable `reports/playwright/results.json` through the project
+report reader and returns structured facts. Perrona presents those facts as a
+short text summary. Requests such as `lihat report` do not send
+`index.html`; an explicit request to deliver the report artifact is a separate
+intent.
 
 Messaging channels and scheduling are intentionally not configured in this
 phase.

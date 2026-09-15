@@ -38,6 +38,10 @@ async function verifyDashboardIsOpened(page) {
   await new DashboardPage(page).verifyIsOpened();
 }
 
+async function verifyDashboardSideMenu(page) {
+  await new DashboardPage(page).verifySideMenu();
+}
+
 async function verifyLoginErrorIsDisplayed(page) {
   await new LoginPage(page).verifyLoginErrorIsDisplayed();
 }
@@ -48,5 +52,6 @@ module.exports = {
   loginWithValidCredentials,
   loginWithInvalidCredentials,
   verifyDashboardIsOpened,
+  verifyDashboardSideMenu,
   verifyLoginErrorIsDisplayed,
 };

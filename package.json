@@ -13,7 +13,10 @@
     "test:smoke": "playwright test --grep @smoke",
     "test:critical": "playwright test --grep @critical",
     "test:regression": "playwright test --grep @regression",
-    "report": "playwright show-report reports/playwright",
+    "report": "playwright show-report reports/playwright/html",
+    "report:summary": "node helpers/reportReader.js summary",
+    "report:details": "node helpers/reportReader.js details",
+    "report:failures": "node helpers/reportReader.js failures",
     "allure:generate": "allure generate reports/allure-results --output reports/allure-report",
     "allure:open": "allure open reports/allure-report",
     "allure:serve": "allure open reports/allure-results"

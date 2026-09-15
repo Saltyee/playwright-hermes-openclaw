@@ -4,9 +4,21 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 
+const suiteNames = {
+  test: 'All tests',
+  'test:headed': 'All tests',
+  'test:debug': 'All tests',
+  'test:smoke': 'Smoke',
+  'test:critical': 'Critical',
+  'test:regression': 'Regression',
+};
+
 module.exports = defineConfig({
   testDir: './tests',
   outputDir: './reports/test-results',
+  metadata: {
+    suite: suiteNames[process.env.npm_lifecycle_event] || 'Custom',
+  },
   timeout: 30_000,
   expect: {
     timeout: 10_000,
@@ -17,7 +29,8 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'reports/playwright', open: 'never' }],
+    ['html', { outputFolder: 'reports/playwright/html', open: 'never' }],
+    ['json', { outputFile: 'reports/playwright/results.json' }],
     ['allure-playwright', { resultsDir: 'reports/allure-results' }],
   ],
   use: {

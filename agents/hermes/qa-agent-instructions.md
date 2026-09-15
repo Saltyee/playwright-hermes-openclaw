@@ -40,6 +40,9 @@ npm run test:smoke
 npm run test:critical
 npm run test:regression
 npx playwright test tests/authentication/valid-login.test.js
+npm run report:summary
+npm run report:details
+npm run report:failures
 ```
 
 For a report-only run, execute the requested command directly. A fresh run
@@ -55,7 +58,8 @@ second duration.
 
 Use the framework's known evidence locations after a run:
 
-- `reports/playwright/index.html`
+- `reports/playwright/html/index.html`
+- `reports/playwright/results.json`
 - `reports/allure-results/`
 - `reports/test-results/.last-run.json`
 
@@ -63,6 +67,25 @@ Do not use broad filesystem discovery such as `find .` to locate reports. Do
 not run `gh auth status` or another credential-status command for a report-only
 test. GitHub authentication is relevant only when an authorized, verified
 automation repair is ready to push and open as a Draft Pull Request.
+
+## Latest report requests
+
+For a request to view, check, or summarize the latest report, do not run a new
+test and do not return or attach the HTML file. Run exactly one matching reader:
+
+- summary → `npm run report:summary`
+- individual test details → `npm run report:details`
+- failed tests only → `npm run report:failures`
+
+Return the reader's structured fields concisely, including suite, status,
+counts, duration, generation time, and requested test details. Do not return
+the raw Playwright JSON. Preserve `REPORT_NOT_FOUND`, `REPORT_INVALID`,
+`PASSED`, `FAILED`, or `NO_TESTS` exactly.
+
+A report-reading request is read-only. Do not investigate, repair, edit, rerun
+tests, create a branch, commit, push, or open a Pull Request unless the user
+separately requests that action. If the saved report is old, report its
+generation time without automatically running another test.
 
 ## Required evidence before editing
 

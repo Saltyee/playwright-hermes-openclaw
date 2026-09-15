@@ -6,7 +6,7 @@ OrangeHRM Demo is currently used as the sample application while the framework i
 
 The framework includes Playwright MCP for browser exploration, Hermes as the QA
 execution and controlled-repair agent, and OpenClaw as the local QA
-orchestrator.
+orchestrator. OpenCode and Ollama provide a separate local development assistant.
 
 ## Architecture
 
@@ -51,6 +51,21 @@ Hermes
 OrangeHRM / Test Result / Repair / Draft PR
 ```
 
+Local AI-assisted development is separate from the QA runtime:
+
+```text
+Developer
+  ↓
+OpenCode
+  ↓
+Ollama
+  ├── Repository
+  ├── Terminal
+  └── Playwright MCP
+        ↓
+      Browser
+```
+
 ## Folder structure
 
 ```text
@@ -68,6 +83,9 @@ web-automation-agent/
 ├── mcp/                   # AI browser integration using Playwright MCP
 ├── .codex/config.toml     # Project-scoped MCP configuration for Codex
 ├── .hermes.md             # Project instructions automatically read by Hermes
+├── docs/opencode-development.md
+├── AGENTS.md              # OpenCode V2 project instructions
+├── opencode.jsonc         # OpenCode, Ollama, and Playwright MCP configuration
 ├── playwright.config.js
 └── package.json
 ```
@@ -135,13 +153,15 @@ npm run test:regression
 
 ## Test reports
 
-Each test run creates both Playwright HTML data and Allure result data. Reporting is configured centrally in `playwright.config.js`; individual tests do not contain screenshot, video, trace, or report-generation code.
+Each test run creates Playwright HTML and JSON reports plus Allure result data. Reporting is configured centrally in `playwright.config.js`; individual tests do not contain screenshot, video, trace, or report-generation code.
 
 Generated output is organized as:
 
 ```text
 reports/
-├── playwright/       # Playwright HTML report
+├── playwright/
+│   ├── html/         # Playwright HTML report
+│   └── results.json  # Machine-readable Playwright result
 ├── test-results/     # Screenshots, videos, and traces
 ├── allure-results/   # Raw Allure result data
 └── allure-report/    # Generated Allure HTML report
@@ -158,6 +178,19 @@ Open the latest report:
 ```bash
 npm run report
 ```
+
+Read the latest report as structured JSON without opening or sending the HTML
+artifact:
+
+```bash
+npm run report:summary
+npm run report:details
+npm run report:failures
+```
+
+Hermes uses these reader commands when Perrona receives a natural-language
+report request. Perrona summarizes the structured result as text; she does not
+send `index.html` by default.
 
 ### Allure Report
 
@@ -383,6 +416,38 @@ failures are reported separately from orchestration failures.
 
 See `agents/openclaw/README.md` for usage and
 `agents/openclaw/qa-orchestrator-instructions.md` for the operating rules.
+
+## Local AI Development
+
+OpenCode is the coding agent, Ollama is the local model runtime, and Playwright
+MCP gives OpenCode interactive browser access. Playwright Test remains the
+deterministic automation runner. This development setup does not replace or sit
+inside the Perrona, OpenClaw, and Hermes runtime.
+
+Start the local tools from the project root:
+
+```bash
+ollama serve
+opencode
+```
+
+Inside OpenCode, a safe first request is:
+
+```text
+Use Playwright MCP to inspect the OrangeHRM login page.
+```
+
+Run the normal smoke test separately:
+
+```bash
+npm run test:smoke
+```
+
+OpenCode V2 loads the repository `AGENTS.md` automatically. The project config
+uses Ollama model discovery, so choose an installed model with `/models` rather
+than committing a machine-specific model choice. Setup and verification details
+are in `docs/opencode-development.md`. The existing `.codex/config.toml` remains
+available while both development assistants are evaluated side by side.
 
 ## Test suites
 
